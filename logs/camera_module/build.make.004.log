@@ -1,0 +1,9 @@
+[ 25%] [34m[1mGenerate virtualenv in /home/rover/WinterResearch/build/camera_module/venv[0m
+True
+[ 50%] [34m[1mInstall requirements to /home/rover/WinterResearch/build/camera_module/venv[0m
+[31mERROR: rosdep 0.21.0 has requirement rospkg>=1.3.0, but you'll have rospkg 1.2.6 which is incompatible.[0m
+[31mERROR: open3d 0.15.2 has requirement setuptools>=40.8.0, but you'll have setuptools 39.0.1 which is incompatible.[0m
+[31mERROR: jupyter-packaging 0.10.6 has requirement setuptools>=46.4.0, but you'll have setuptools 39.0.1 which is incompatible.[0m
+[ 75%] [34m[1mPrepare relocated virtualenvs for develspace and installspace[0m
+[100%] [34m[1mPer-package virtualenv target[0m
+[100%] Built target camera_module_generate_virtualenv

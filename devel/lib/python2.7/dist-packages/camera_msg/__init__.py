@@ -1,0 +1,1 @@
+/home/rover/WinterResearch/devel/.private/camera_msg/lib/python2.7/dist-packages/camera_msg/__init__.py

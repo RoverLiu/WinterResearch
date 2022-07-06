@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /home/rover/WinterResearch/devel/.private/camera_module/setup.sh

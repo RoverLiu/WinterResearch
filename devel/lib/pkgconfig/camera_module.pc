@@ -1,0 +1,1 @@
+/home/rover/WinterResearch/devel/.private/camera_module/lib/pkgconfig/camera_module.pc

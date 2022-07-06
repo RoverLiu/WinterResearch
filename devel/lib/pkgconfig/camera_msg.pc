@@ -1,0 +1,1 @@
+/home/rover/WinterResearch/devel/.private/camera_msg/lib/pkgconfig/camera_msg.pc
