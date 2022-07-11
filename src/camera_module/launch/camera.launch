@@ -37,5 +37,5 @@
   <node name="camera_throttler_depth" type="throttle" pkg="topic_tools" args="messages /camera/depth/image_rect_raw/compressed 4 /camera/depth/image_rect_raw/compressed_throttled" />
 
   <!-- launch python -->
-  <!-- <node name="camera_detection" pkg="camera_module" type="test_scripts.py" /> -->
+  <node name="camera_detection" pkg="camera_module" type="test_scripts.py" />
 </launch>

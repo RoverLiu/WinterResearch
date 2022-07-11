@@ -9,5 +9,5 @@ catkin build
 ## run
 ```
 roslaunch camera_module camera.launch
-rosrun camera_module test_scripts.py
+ (test - Not needed) rosrun camera_module test_scripts.py
 ```

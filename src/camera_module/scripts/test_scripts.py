@@ -121,7 +121,6 @@ class human_detection:
             frame,
             results.pose_landmarks,
             self.mp_pose.POSE_CONNECTIONS,
-            # landmark_drawing_spec=mp_drawing_styles.get_default_pose_landmarks_style())
         )
         # Flip the image horizontally for a selfie-view display.
         cv2.imshow('MediaPipe Pose', cv2.flip(frame, 1))
@@ -130,21 +129,34 @@ class human_detection:
         # calculate angle      
         if results.pose_landmarks:
             # update 2D pose
-            self.left_arm_pose.hip = results.pose_landmarks.landmark[0]
-            
+            self.pose_update(results.pose_landmarks)            
             
         else:
             self.is_detected = False
 
-    def pose_update(self, h1, h2):
+    def pose_update(self, landmarks):
         # confirm whether only v1 and v2 are needed
-        list_of_angles = []
-        angle_h1 = float(h1-self.camera_width/2)/(self.camera_width/2)*(self.HFOV)
-        angle_h2 = float(h2-self.camera_width/2)/(self.camera_width/2)*(self.HFOV)
-        list_of_angles = [angle_h1,angle_h2]
         
-        print(list_of_angles)
-        return list_of_angles
-
+        output = JointState()
+        
+        output.left.shoulder = [landmarks.landmark[11].x, landmarks.landmark[11].y, landmarks.landmark[11].z, landmarks.landmark[11].visibility]
+        output.left.elbow = [landmarks.landmark[13].x, landmarks.landmark[13].y, landmarks.landmark[13].z, landmarks.landmark[13].visibility]
+        output.left.wrist = [landmarks.landmark[15].x, landmarks.landmark[15].y, landmarks.landmark[15].z, landmarks.landmark[15].visibility]
+        output.left.hand_pinky = [landmarks.landmark[17].x, landmarks.landmark[17].y, landmarks.landmark[17].z, landmarks.landmark[17].visibility]
+        output.left.hand_index = [landmarks.landmark[19].x, landmarks.landmark[19].y, landmarks.landmark[19].z, landmarks.landmark[19].visibility]
+        output.left.hand_thumb = [landmarks.landmark[21].x, landmarks.landmark[21].y, landmarks.landmark[21].z, landmarks.landmark[21].visibility]
+        output.left.hip = [landmarks.landmark[23].x, landmarks.landmark[23].y, landmarks.landmark[23].z, landmarks.landmark[23].visibility]
+        
+        output.right.shoulder = [landmarks.landmark[12].x, landmarks.landmark[12].y, landmarks.landmark[12].z, landmarks.landmark[12].visibility]
+        output.right.elbow = [landmarks.landmark[14].x, landmarks.landmark[14].y, landmarks.landmark[14].z, landmarks.landmark[14].visibility]
+        output.right.wrist = [landmarks.landmark[16].x, landmarks.landmark[16].y, landmarks.landmark[16].z, landmarks.landmark[16].visibility]
+        output.right.hand_pinky = [landmarks.landmark[18].x, landmarks.landmark[18].y, landmarks.landmark[18].z, landmarks.landmark[18].visibility]
+        output.right.hand_index = [landmarks.landmark[20].x, landmarks.landmark[20].y, landmarks.landmark[20].z, landmarks.landmark[20].visibility]
+        output.right.hand_thumb = [landmarks.landmark[22].x, landmarks.landmark[22].y, landmarks.landmark[22].z, landmarks.landmark[22].visibility]
+        output.right.hip = [landmarks.landmark[24].x, landmarks.landmark[24].y, landmarks.landmark[24].z, landmarks.landmark[24].visibility]
+        
+        self.pub.publish(output)
+        
+        
 if __name__ == "__main__":
     human_detection()
