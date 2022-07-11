@@ -139,7 +139,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/trolleybot_node.cpp)
+add_executable(${PROJECT_NAME}_node src/arm.cpp src/camera_pose.cpp src/joint.cpp src/main.cpp)
 # add_executable(laser_republisher_node
 #     src/LaserRepublisherNode.cpp
 #     src/LaserRepublisher.cpp
