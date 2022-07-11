@@ -1,1 +1,0 @@
-/home/rover/WinterResearch/devel/.private/camera_msg/share/camera_msg/cmake/camera_msg-msg-paths.cmake

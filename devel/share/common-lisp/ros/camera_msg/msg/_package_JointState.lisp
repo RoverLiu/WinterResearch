@@ -1,1 +1,0 @@
-/home/rover/WinterResearch/devel/.private/camera_msg/share/common-lisp/ros/camera_msg/msg/_package_JointState.lisp

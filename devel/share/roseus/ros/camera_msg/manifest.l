@@ -1,1 +1,0 @@
-/home/rover/WinterResearch/devel/.private/camera_msg/share/roseus/ros/camera_msg/manifest.l

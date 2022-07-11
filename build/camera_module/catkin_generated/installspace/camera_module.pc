@@ -1,8 +1,0 @@
-prefix=/home/rover/WinterResearch/install
-
-Name: camera_module
-Description: Description of camera_module
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: roscpp rospy std_msgs geometry_msgs sensor_msgs camera_msg message_runtime
