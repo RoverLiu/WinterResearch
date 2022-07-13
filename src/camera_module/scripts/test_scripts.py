@@ -6,7 +6,6 @@ from torch import true_divide
 from camera_msg.msg import JointState
 import numpy as np
 import rospy
-import copy
 import cv2
 from sensor_msgs.msg import CompressedImage, PointCloud2
 import sensor_msgs.point_cloud2 as pc2
@@ -30,11 +29,6 @@ class human_detection:
         # camera details
         self.camera_width = 640
         self.camera_height = 480
-        self.HFOV = 53.50
-        self.VFOV = 41.6
-        self.angle_offset = 0
-        self.angle_boundary = 0
-        self.count=0
         
         #topic subcribption 
         self.image_topic = '/camera/color/image_raw/compressed_throttled'
@@ -54,32 +48,6 @@ class human_detection:
         # rospy.Subscriber(self.pointcloud_topic, PointCloud2, self.pointcloud_callback)
         self.pub = rospy.Publisher(self.output_topic, JointState, queue_size=10)
         rospy.spin()
-
-    # def pointcloud_callback(self, ros_data):
-    #     # dat = pc2.read_points(ros_data, field_names = ("x", "y", "z", "rgb"), skip_nans=False, uvs=[(640,0)])
-    #     # print("data size: {}, height: {}, width: {}, raw_step: {}".format(sum(1 for _ in dat), ros_data.height, ros_data.width, ros_data.row_step))
-    #     nose = (self.read_depth(round(self.left_arm_pose.hip.x*self.camera_width), round(self.left_arm_pose.hip.y*self.camera_height), ros_data))
-    #     # print("nose position: x {}, y {}, z {}".format(nose[0], nose[1], nose[2]))
-    #     for p in nose:
-    #         print(p)
-        
-    #     rospy.sleep(1.0)
-    #     # self.read_depth(self.no)
-    #     # for p in dat:
-    #         # print(" x : {}  y: {} z: {}".format(p[0],p[1],p[2]))
-    #     # print("height: {}, width: {}, size of data: {}".format( ros_data.height, ros_data.width, len(ros_data.data)))
-    #     # pass
-        
-    
-    # def read_depth(self, width, height, data) :
-    #     # rospy.loginfo("Data width: {}, data height: {}".format(data.width, data.height))
-    #     # read function
-    #     if (self.camera_width*height+width >= data.width) :
-    #         return -1
-    #     int_data = pc2.read_points(data, field_names=None, skip_nans=False, uvs=[(self.camera_width*height+width, 0)])
-    #     # int_data = next(data_out)
-    #     # rospy.loginfo("int_data " + str(int_data))
-    #     return int_data
 
     # camera callback function (process RGB data and save)
     def cam_callback(self, ros_data):

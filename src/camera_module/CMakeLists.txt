@@ -173,6 +173,7 @@ add_executable(${PROJECT_NAME}_node src/arm.cpp src/camera_pose.cpp src/joint.cp
 ## in contrast to setup.py, you can choose the destination
 catkin_install_python(PROGRAMS
   scripts/test_scripts.py
+  scripts/camera_detection.py
 #   scripts/Rover_human_Detection.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
