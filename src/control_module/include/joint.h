@@ -1,3 +1,17 @@
+/**
+ * @file joint.h
+ * @author Rover (you@domain.com)
+ * @brief save the joint details
+ * @version 0.1
+ * @date 2022-07-13
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
+#ifndef __JOINT_H
+#define __JOINT_H
+
 // this module handles each joint on the human body
 
 class joint
@@ -25,3 +39,4 @@ public:
 };
 
 
+#endif

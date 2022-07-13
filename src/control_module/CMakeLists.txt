@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(camera_module)
+project(control_module)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -9,7 +9,6 @@ project(camera_module)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   roscpp
-  rospy
   std_msgs
   sensor_msgs
   camera_msg
@@ -27,6 +26,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_generate_virtualenv(
     PYTHON_INTERPRETER python3.6
 )
+
 
 ################################################
 ## Declare ROS messages, services and actions ##
@@ -55,7 +55,8 @@ catkin_generate_virtualenv(
 ## Generate messages in the 'msg' folder
 # add_message_files(
 #   FILES
-#   HumanAngle.msg
+#   Message1.msg
+#   Message2.msg
 # )
 
 ## Generate services in the 'srv' folder
@@ -108,7 +109,7 @@ catkin_generate_virtualenv(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-  # INCLUDE_DIRS include
+  INCLUDE_DIRS include
 #  LIBRARIES trolleybot
   CATKIN_DEPENDS roscpp rospy std_msgs
 #  DEPENDS system_lib
@@ -122,13 +123,13 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-  # include
+  include
   ${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/trolleybot.cpp
+#   src/${PROJECT_NAME}/control_module.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -139,12 +140,8 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/arm.cpp src/camera_pose.cpp src/joint.cpp src/main.cpp)
-# add_executable(laser_republisher_node
-#     src/LaserRepublisherNode.cpp
-#     src/LaserRepublisher.cpp
-#     )
-# -------------------------------------------------------------------------------------------------------------------------------------------
+# add_executable(${PROJECT_NAME}_node src/control_module_node.cpp)
+add_executable(${PROJECT_NAME}_node src/arm.cpp src/camera_pose.cpp src/joint.cpp src/main.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -156,11 +153,10 @@ include_directories(
 ## same as for the library above
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
-## Specify libraries to link a library or executable target against
-# target_link_libraries(laser_republisher_node
-#   ${catkin_LIBRARIES}
-# )
-# -------------------------------------------------------------------------------------------------------------------------------------------
+# Specify libraries to link a library or executable target against
+target_link_libraries(${PROJECT_NAME}_node
+  ${catkin_LIBRARIES}
+)
 
 #############
 ## Install ##
@@ -171,12 +167,10 @@ include_directories(
 
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
-catkin_install_python(PROGRAMS
-  scripts/test_scripts.py
-  scripts/camera_detection.py
-#   scripts/Rover_human_Detection.py
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
+# catkin_install_python(PROGRAMS
+#   scripts/my_python_script
+#   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+# )
 
 ## Mark executables for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_executables.html
@@ -205,6 +199,7 @@ catkin_install_python(PROGRAMS
 #   # myfile2
 #   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 # )
+
 install(FILES requirements.txt
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 
@@ -213,7 +208,7 @@ install(FILES requirements.txt
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_trolleybot.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_control_module.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
