@@ -1,0 +1,10 @@
+
+<launch>  
+  <!-- launch python -->
+  <node name="camera_detection" pkg="camera_module" type="camera_detection.py" />
+
+  <!-- throttle data -->
+  <node name="camera_detection_throttler" type="throttle" pkg="topic_tools" args="messages /human_pose 5 /human_pose_throttled" />
+  <!-- <node name="camera_throttler_depth" type="throttle" pkg="topic_tools" args="messages /camera/depth/image_rect_raw/compressed 4 /camera/depth/image_rect_raw/compressed_throttled" /> -->
+
+</launch>

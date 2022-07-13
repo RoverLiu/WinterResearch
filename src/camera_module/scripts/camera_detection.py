@@ -86,7 +86,8 @@ class human_pose_estimation:
         depth_pixel.append(round(landmark.x * self.camera_width))
         depth_pixel.append(round(landmark.y * self.camera_height))
         
-        if (depth_pixel[0] >= self.camera_width or depth_pixel[1] >= self.camera_height):
+        if (depth_pixel[0] >= self.camera_width or depth_pixel[1] >= self.camera_height 
+            or depth_pixel[0] < 0 or depth_pixel[1] < 0):
             # fail
             return [0,0,-1]
         
@@ -130,7 +131,6 @@ class human_pose_estimation:
         # calculate pose
         
         output = JointState()
-        # self.landmark2coordinate(landmark=landmarks.landmark[11])
         output.left.shoulder = self.landmark2coordinate(landmark=landmarks.landmark[11])
         # output.left.shoulder = [landmarks.landmark[11].x, landmarks.landmark[11].y, landmarks.landmark[11].z, landmarks.landmark[11].visibility]
         output.left.elbow = self.landmark2coordinate(landmark=landmarks.landmark[13])
