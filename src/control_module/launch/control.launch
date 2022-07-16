@@ -1,0 +1,6 @@
+
+<launch>  
+
+  <node name="camera_manager" type="control_module_node" pkg="control_module" output = "screen" />
+
+</launch>
