@@ -13,8 +13,28 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   camera_msg
   catkin_virtualenv
+  interactive_markers
+  moveit_core
+  moveit_visual_tools
+  moveit_ros_planning
+  moveit_ros_planning_interface
+  moveit_ros_perception
+  pluginlib
+  geometric_shapes
+  pcl_ros
+  pcl_conversions
+  rosbag
+  tf2_ros
+  tf2_eigen
+  tf2_geometry_msgs
 )
 
+find_package(Eigen3 REQUIRED)
+find_package(Boost REQUIRED system filesystem date_time thread)
+find_package(Qt4 COMPONENTS QtCore QtGui)
+FIND_PACKAGE(OpenCV REQUIRED) # tested on 2.3.1
+INCLUDE(${QT_USE_FILE})
+ADD_DEFINITIONS(${QT_DEFINITIONS})
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
@@ -109,11 +129,20 @@ catkin_generate_virtualenv(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
+  LIBRARIES
   INCLUDE_DIRS include
 #  LIBRARIES trolleybot
   CATKIN_DEPENDS roscpp rospy std_msgs
 #  DEPENDS system_lib
   CATKIN_DEPENDS geometry_msgs sensor_msgs camera_msg message_runtime
+  CATKIN_DEPENDS
+    moveit_core
+    moveit_visual_tools
+    moveit_ros_planning_interface
+    interactive_markers
+    tf2_geometry_msgs
+  DEPENDS
+    EIGEN3
 )
 
 ###########
@@ -141,8 +170,16 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/control_module_node.cpp)
-add_executable(${PROJECT_NAME}_node src/arm.cpp src/camera_pose.cpp src/joint.cpp src/main.cpp)
+add_executable(${PROJECT_NAME}_node 
+  src/arm.cpp
+  src/camera_pose.cpp 
+  src/joint.cpp 
+  src/main.cpp
+  # src/arm_manager.cpp
+  src/robot_arm_control.cpp)
 
+add_executable(arm_test_node src/arm_controller.cpp)
+target_link_libraries(arm_test_node ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use
@@ -156,7 +193,17 @@ add_executable(${PROJECT_NAME}_node src/arm.cpp src/camera_pose.cpp src/joint.cp
 # Specify libraries to link a library or executable target against
 target_link_libraries(${PROJECT_NAME}_node
   ${catkin_LIBRARIES}
+  ${Boost_LIBRARIES} 
+  ${QT_LIBRARIES} 
+  ${OpenCV_LIBRARIES}
 )
+
+include_directories(include 
+  ${THIS_PACKAGE_INCLUDE_DIRS} 
+  ${catkin_INCLUDE_DIRS} 
+  ${Boost_INCLUDE_DIR} 
+  ${EIGEN3_INCLUDE_DIRS} 
+  ${OpenCV_INCLUDE_DIRS})
 
 #############
 ## Install ##
@@ -203,6 +250,9 @@ target_link_libraries(${PROJECT_NAME}_node
 install(FILES requirements.txt
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 
+install(TARGETS arm_test_node DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
+install(DIRECTORY launch DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 #############
 ## Testing ##
 #############
