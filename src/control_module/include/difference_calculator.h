@@ -12,6 +12,7 @@
 #define __DIFFERENCE_CALCULATOR_H
 
 #include <vector>
+#include "MinimumDistance4.h"
 class difference_calculator
 {
 private:
