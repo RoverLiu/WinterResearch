@@ -20,6 +20,7 @@ camera_pose::~camera_pose()
 
 void camera_pose::HumanPoseCallback(const camera_msg::JointState::ConstPtr& msg) 
 {
+    // std::cout<<"Callback triggered\n";
     is_left_arm_ready = filter_callback_dat(msg->left, &left);
     if (is_left_arm_ready) {
         arm::copy(&left, left_ready);
@@ -48,7 +49,7 @@ bool camera_pose::filter_callback_dat(camera_msg::arm original, arm* to_save)
     joint::joint_copy(original.wrist, &(to_save->wrist));
     
     // show results
-    printf("[Arm Log] elbow - x: %f, y: %f, z: %f\n", to_save->elbow.get_x(), to_save->elbow.get_y(), to_save->elbow.get_z());
+    // printf("[Arm Log] elbow - x: %f, y: %f, z: %f\n", to_save->elbow.get_x(), to_save->elbow.get_y(), to_save->elbow.get_z());
 
     // check state
     bool state = true;

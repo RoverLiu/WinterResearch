@@ -1,0 +1,42 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "${default}",
+        "limitSymbolsToIncludedHeaders": false
+      },
+      "includePath": [
+        "/home/yumi/WinterResearch/devel/include/**",
+        "/home/yumi/yumi_depends_ws/devel_isolated/yumi_hw/include/**",
+        "/home/yumi/yumi_depends_ws/devel_isolated/industrial_msgs/include/**",
+        "/home/yumi/yumi_depends_ws/devel_isolated/abb_robot_msgs/include/**",
+        "/home/yumi/yumi_depends_ws/devel_isolated/abb_rapid_sm_addin_msgs/include/**",
+        "/home/yumi/yumi_depends_ws/devel_isolated/abb_rapid_msgs/include/**",
+        "/home/yumi/yumi_depends_ws/devel_isolated/abb_egm_msgs/include/**",
+        "/opt/ros/melodic/include/**",
+        "/home/yumi/yumi_depends_ws/devel_isolated/abb_egm_rws_managers/include/**",
+        "/home/yumi/yumi_depends_ws/devel_isolated/abb_librws/include/**",
+        "/home/yumi/yumi_depends_ws/devel_isolated/abb_libegm/include/**",
+        "/home/yumi/yumi_depends_ws/src/abb_robot_driver/abb_egm_hardware_interface/include/**",
+        "/home/yumi/yumi_depends_ws/src/abb_robot_driver/abb_egm_state_controller/include/**",
+        "/home/yumi/yumi_depends_ws/src/abb_robot_driver/abb_robot_cpp_utilities/include/**",
+        "/home/yumi/yumi_depends_ws/src/abb_robot_driver/abb_rws_service_provider/include/**",
+        "/home/yumi/yumi_depends_ws/src/abb_robot_driver/abb_rws_state_publisher/include/**",
+        "/home/yumi/WinterResearch/src/control_module/include/**",
+        "/home/yumi/yumi_depends_ws/src/industrial_core/industrial_robot_client/include/**",
+        "/home/yumi/yumi_depends_ws/src/industrial_core/industrial_trajectory_filters/include/**",
+        "/home/yumi/yumi_depends_ws/src/industrial_core/industrial_utils/include/**",
+        "/home/yumi/yumi_depends_ws/src/industrial_core/simple_message/include/**",
+        "/home/yumi/yumi_depends_ws/src/yumi/yumi_hw/include/**",
+        "/home/yumi/yumi_depends_ws/src/yumi/yumi_test_controllers/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS",
+      "intelliSenseMode": "gcc-x64",
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "gnu11",
+      "cppStandard": "c++14"
+    }
+  ],
+  "version": 4
+}

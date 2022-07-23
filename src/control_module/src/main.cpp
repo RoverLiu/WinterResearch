@@ -9,6 +9,8 @@ int main( int argc, char** argv )
     ros::init( argc, argv, "Control_Module");
     ros::NodeHandle nh;
     ros::NodeHandle nh_priv( "~" );
+    ros::AsyncSpinner spinner(2);
+    spinner.start();
 
     // todo
     control_manager my_control_manager(nh, nh_priv);
@@ -22,10 +24,11 @@ int main( int argc, char** argv )
         // // robots start deliver pizzas
         // my_robot.deliver_pizza();
         ROS_DEBUG("Normal Running");
+        std::cout<<"---------------------------Looping----------------------\n";
 
         my_control_manager.imitation();
 
-        // ros::spinOnce();
+        ros::spinOnce();
         ros::Duration(1.0).sleep(); // sleep for one second
     }
     

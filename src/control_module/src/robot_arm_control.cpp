@@ -384,7 +384,7 @@ bool robot_arm_control::save_IK_callback(robot_state::RobotState* robot_state,
     for (std::size_t i = 0; i < joint_names.size(); i++)
     {
         // show
-        ROS_INFO("Joint %s: %f", joint_names[i].c_str(), joint_group_variable_values[i]);
+        // ROS_INFO("Joint %s: %f", joint_names[i].c_str(), joint_group_variable_values[i]);
         
         // copy
         std::vector<double> dest;
@@ -447,7 +447,7 @@ std::vector<std::vector<double>> robot_arm_control::get_angle_position(std::vect
         const Eigen::Isometry3d& link_state = 
             robot_kinematic_state->getGlobalLinkTransform(link_names[i]);
         // show
-        std::cout<<link_names[i]<<": \n" << link_state.translation() << "\n";
+        // std::cout<<link_names[i]<<": \n" << link_state.translation() << "\n";
         // save
         std::vector<double> position;
         position.push_back(link_state.translation().x());
@@ -531,6 +531,11 @@ geometry_msgs::PoseStamped robot_arm_control::get_pose_in_robot_frame(arm* arm, 
 
     // rotate to robot frame
     rotate_from_camera_to_robot(camera_frame, robot_frame);
+
+    printf("[ROBOT ARM CONTROL] camera frame: (%f, %f, %f)\n \trobot frame: (%f, %f, %f)\n \tsize factor: %f\n",
+        camera_frame.pose.position.x, camera_frame.pose.position.y, camera_frame.pose.position.z,
+        robot_frame.pose.position.x, robot_frame.pose.position.y, robot_frame.pose.position.z,
+        size_factor);
 
     return robot_frame;
 }

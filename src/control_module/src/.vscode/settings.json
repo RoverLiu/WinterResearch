@@ -1,0 +1,12 @@
+{
+    "python.autoComplete.extraPaths": [
+        "/home/yumi/WinterResearch/devel/lib/python2.7/dist-packages",
+        "/home/yumi/yumi_depends_ws/devel_isolated/yumi_hw/lib/python2.7/dist-packages",
+        "/home/yumi/yumi_depends_ws/devel_isolated/industrial_msgs/lib/python2.7/dist-packages",
+        "/home/yumi/yumi_depends_ws/devel_isolated/abb_robot_msgs/lib/python2.7/dist-packages",
+        "/home/yumi/yumi_depends_ws/devel_isolated/abb_rapid_sm_addin_msgs/lib/python2.7/dist-packages",
+        "/home/yumi/yumi_depends_ws/devel_isolated/abb_rapid_msgs/lib/python2.7/dist-packages",
+        "/home/yumi/yumi_depends_ws/devel_isolated/abb_egm_msgs/lib/python2.7/dist-packages",
+        "/opt/ros/melodic/lib/python2.7/dist-packages"
+    ]
+}
