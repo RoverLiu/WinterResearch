@@ -11,6 +11,8 @@
 
 #ifndef __JOINT_H
 #define __JOINT_H
+#include <vector>
+#include <iostream>
 
 // this module handles each joint on the human body
 
@@ -35,6 +37,16 @@ public:
 
     bool is_reliable();
     void set_reliable(bool state);
+
+    /**
+     * @brief copy the joint data
+     * 
+     * @param src 
+     * @param dest 
+     */
+    static void joint_copy(std::vector<float> src, joint* dest);
+    static void joint_copy(joint* src, joint* dest);
+    static bool is_same(double a, double b);
 
 };
 

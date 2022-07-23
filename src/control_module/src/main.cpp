@@ -1,5 +1,7 @@
 #include "camera_pose.h"
 #include <ros/ros.h>
+#include "arm_manager.h"
+#include "control_manager.h"
 
 int main( int argc, char** argv )
 {
@@ -7,7 +9,10 @@ int main( int argc, char** argv )
     ros::init( argc, argv, "Control_Module");
     ros::NodeHandle nh;
     ros::NodeHandle nh_priv( "~" );
-    camera_pose my_camera_manager(nh, nh_priv);
+
+    // todo
+    control_manager my_control_manager(nh, nh_priv);
+
 
     while( ros::ok() )
     { 
@@ -17,6 +22,8 @@ int main( int argc, char** argv )
         // // robots start deliver pizzas
         // my_robot.deliver_pizza();
         ROS_DEBUG("Normal Running");
+
+        my_control_manager.imitation();
 
         // ros::spinOnce();
         ros::Duration(1.0).sleep(); // sleep for one second

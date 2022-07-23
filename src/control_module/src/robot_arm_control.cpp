@@ -2,8 +2,8 @@
  * @file robot_arm_control.cpp
  * @author Rover
  * @brief Control robot arm with all basic functions
- * @version 0.1
- * @date 2022-02-16
+ * @version 0.2
+ * @date 2022-07-15
  * 
  * @copyright Copyright (c) 2022
  * 
@@ -29,7 +29,11 @@
 
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+#include <tf2/LinearMath/Vector3.h>
 
+#include <moveit/robot_model/robot_model.h>
+#include <moveit/robot_state/robot_state.h>
+#include "arm.h"
 /**
  * @brief Construct a new robot arm control::robot arm control object
  * 
@@ -54,6 +58,14 @@ robot_arm_control::robot_arm_control(ros::NodeHandle nh, ros::NodeHandle nh_priv
     move_group->setPlanningTime(30);
     move_group->setPlannerId("RRTConnectkConfigDefault");
     
+    /*------------------------------------------set up kinematic state---------------------------------------*/
+    robot_kinematic_state = move_group->getCurrentState();
+    joint_names = joint_model_group->getVariableNames();
+    std::cout<<"Again, the joint names:"<<std::endl;
+    for (int i = 0; i < joint_names.size(); i++) {
+        std::cout<< joint_names[i] <<std::endl;
+    }
+
     /*------------------------------------------set up griper control---------------------------------------*/
     gripper_pub = nh.advertise<std_msgs::Float64>(gripper_topic, 1000);
 
@@ -78,7 +90,7 @@ robot_arm_control::robot_arm_control(ros::NodeHandle nh, ros::NodeHandle nh_priv
     stand_primitive.dimensions[1] = 1.0;
     stand_primitive.dimensions[2] = 0.15;
 
-    // position
+    // object position
     geometry_msgs::Pose box_pose;
     box_pose.orientation.w = 1.0;
     box_pose.position.x = 0.5;
@@ -288,7 +300,7 @@ void robot_arm_control::reset_griper_direction()
  * 
  * @param joint_group_positions THe angle degree for each joint
  */
-void robot_arm_control::reset_arm_pos(std::vector<double> joint_group_positions) 
+void robot_arm_control::move_to_arm_pos_by_angle(std::vector<double> joint_group_positions) 
 {
     move_group->setJointValueTarget(joint_group_positions);
     move_group->plan(my_plan);
@@ -296,67 +308,22 @@ void robot_arm_control::reset_arm_pos(std::vector<double> joint_group_positions)
 }
 
 /**
- * @brief pick up the chocolate from a point and deliver it to the end position
+ * @brief move to the target position with given the id
  * 
- * @param goal The position to pick up the chocolate
- * @param end_pos THe position to drop the chocolate
+ * @param id the index of angle in the joint_values
  */
-void robot_arm_control::pick_up_and_delivery(geometry_msgs::Pose goal, geometry_msgs::Pose end_pos) 
+void robot_arm_control::move_to_arm_pos_by_id(int id) 
 {
-    ros::Duration(3).sleep();  // Sleep for 0.5 second
-    // open gripper
-    gripper_control(1);
-    reset_griper_direction();
-    
-    // get current pos
-    geometry_msgs::PoseStamped current_detail = get_current_pose();
-    geometry_msgs::Pose current_pos = current_detail.pose;
-
-    // generate the path
-    std::vector<geometry_msgs::Pose> waypoints;
-
-    // go to that pos
-    current_pos.position.z = goal.position.z;
-    waypoints.push_back(current_pos);
-
-    current_pos.position.y = goal.position.y;
-    waypoints.push_back(current_pos);
-
-    current_pos.position.x = goal.position.x;
-    waypoints.push_back(current_pos);
-
-    CartesianPath_move_arm(waypoints);
-    ros::Duration(3.0).sleep();
-
-    // pick up
-    gripper_control(0);
-    ros::Duration(2.0).sleep();
-
-    // delivery
-    waypoints.clear();
-
-    std::cout<<"X: "<<end_pos.position.x<<" Y: "<<end_pos.position.y<<" Z: "<<end_pos.position.z<<std::endl;
-    current_pos.position.z = end_pos.position.z;
-    waypoints.push_back(current_pos);
-
-    // follow horizontal and vertial line
-    // current_pos.position.x = end_pos.position.x;
-    // waypoints.push_back(current_pos);
-
-    // current_pos.position.y = end_pos.position.y;
-    // waypoints.push_back(current_pos);
-
-    // go directly
-    current_pos.position.x = end_pos.position.x;
-    current_pos.position.y = end_pos.position.y;
-    waypoints.push_back(current_pos);
-
-    CartesianPath_move_arm(waypoints);
-
-    ros::Duration(3.0).sleep();  // Sleep for 0.5 second
-
-    gripper_control(1);
+    if (id < 0 || id > joint_values.size()) {
+        // error
+        ROS_INFO("Wrong ID is given");
+        return;
+    }
+    move_group->setJointValueTarget(joint_values[id]);
+    move_group->plan(my_plan);
+    move_group->move();
 }
+
 
 /**
  * @brief detach the stand from the world
@@ -379,4 +346,224 @@ void robot_arm_control::attach_stand_object()
     std::vector<moveit_msgs::CollisionObject> collision_objects;
     collision_objects.push_back(stand);
     planning_scene_interface.addCollisionObjects(collision_objects);
+}
+
+/**
+ * @brief calculate all possible joint angle groups 
+ * for the given EEF pose
+ * All potentail results are saved in joint_values
+ * 
+ * @param target 
+ */
+void robot_arm_control::calculate_joint_angles(geometry_msgs::Pose target) 
+{
+    joint_values.clear();
+    auto bind_callback = boost::bind(& robot_arm_control::save_IK_callback, this, _1, _2, _3);
+    robot_kinematic_state->setFromIK(joint_model_group, target, IK_timeout, bind_callback);
+
+    std::cout<<joint_values.size()<<" solutions has been found under "<<IK_timeout<<std::endl;
+}
+
+/**
+ * @brief callback function for IK solver
+ * will always return false, which pushes the 
+ * solver to find all possible solutions with target pose
+ * 
+ * @param robot_state 
+ * @param joint_group 
+ * @param joint_group_variable_values 
+ * @return true 
+ * @return false 
+ */
+bool robot_arm_control::save_IK_callback(robot_state::RobotState* robot_state, 
+            const robot_state::JointModelGroup* joint_group, 
+            const double* joint_group_variable_values)
+{
+    // const std::vector<std::string>& joint_names = joint_group->getVariableNames();
+
+    for (std::size_t i = 0; i < joint_names.size(); i++)
+    {
+        // show
+        ROS_INFO("Joint %s: %f", joint_names[i].c_str(), joint_group_variable_values[i]);
+        
+        // copy
+        std::vector<double> dest;
+        vector_copy(joint_group_variable_values, &dest, joint_names.size());
+        joint_values.push_back(dest);
+    }
+    return false; // Depending on your desition scheme.
+}
+
+/**
+ * @brief copy the vector from pointer to std::vector
+ * 
+ * @param src const double as source
+ * @param dest target std::vector format (destination)
+ * @param size the size of the pointer
+ */
+void robot_arm_control::vector_copy(const double* src, std::vector<double> *dest, int size) 
+{
+    for (std::size_t i = 0; i < size; ++i) {
+        dest->push_back(src[i]);
+    }
+}
+
+/**
+ * @brief Get the angle positions for all solutions
+ * loaded in the joint_values
+ * 
+ * @return std::vector<std::vector<std::vector<double>>> 
+ * [[[1,1,1],[2,2,2],[3,3,3],[4,4,4],[5,5,5],...]]
+ * n*7*3
+ */
+std::vector<std::vector<std::vector<double>>> robot_arm_control::get_angle_positions() 
+{
+    // loop through and save
+    std::vector<std::vector<std::vector<double>>> res;
+    std::cout<<"total "<< joint_values.size() << "solutions would be returned\n";
+    for (int i = 0; i < joint_values.size(); i++) {
+        res.push_back(get_angle_position(joint_values[i]));
+    }
+    return res;
+}
+
+/**
+ * @brief Get the angle position object
+ * 
+ * @return std::vector<std::vector<double>> a group of vector for each joint 
+ */
+std::vector<std::vector<double>> robot_arm_control::get_angle_position(std::vector<double> angle)
+{
+    const std::vector< std::string > & link_names = move_group->getLinkNames();
+
+    std::vector<std::vector<double>> res;
+    
+    // calculate
+    robot_kinematic_state->setJointGroupPositions(joint_model_group, angle);
+
+    // save data
+    for (int i = 0; i < link_names.size(); i++) {
+        // get the linker
+        const Eigen::Isometry3d& link_state = 
+            robot_kinematic_state->getGlobalLinkTransform(link_names[i]);
+        // show
+        std::cout<<link_names[i]<<": \n" << link_state.translation() << "\n";
+        // save
+        std::vector<double> position;
+        position.push_back(link_state.translation().x());
+        position.push_back(link_state.translation().y());
+        position.push_back(link_state.translation().z());
+        res.push_back(position);
+    }
+    return res;
+}
+
+/**
+ * @brief Get the orientation object
+ * calculate the orientation of the hand by given arm detials
+ * @param arm 
+ * @param shoulder_to_hip_position the position transform from hip to shoulder
+ * @return geometry_msgs::PoseStamped pose of arm
+ */
+geometry_msgs::PoseStamped robot_arm_control::get_pose_in_robot_frame(arm* arm, tf2::Vector3& shoulder_to_hip_position) 
+{
+    // get vector
+    std::vector<double> orientation_vector;
+    double x = 0;
+    double y = 0;
+    double z = 0;
+    int count = 0;
+    if (arm->hand_index.is_reliable()) {
+        x+=arm->hand_index.get_x();
+        y+=arm->hand_index.get_y();
+        z+=arm->hand_index.get_z();
+        count += 1;
+    }
+    if (arm->hand_pinky.is_reliable()) {
+        x+=arm->hand_pinky.get_x();
+        y+=arm->hand_pinky.get_y();
+        z+=arm->hand_pinky.get_z();
+        count += 1;
+    }
+    if (arm->hand_thumb.is_reliable()) {
+        x+=arm->hand_thumb.get_x();
+        y+=arm->hand_thumb.get_y();
+        z+=arm->hand_thumb.get_z();
+        count += 1;
+    }
+
+    // get vector relative to wrist
+    if (count != 0) {
+        x = x/count - arm->wrist.get_x();
+        y = y/count - arm->wrist.get_y();
+        z = z/count - arm->wrist.get_z();
+    }
+    else {
+        z = 1;
+    }
+
+    // convert to pose
+    geometry_msgs::PoseStamped camera_frame;
+    geometry_msgs::PoseStamped robot_frame;
+
+    // use the pose relative to hip with length considered
+    // note: different arm length matters
+    // size_factor*(human wrist relative to human shoulder)+(robot shoulder relative to robot hip)
+    double size_factor = ROBOT_ARM_LENGTH / arm->get_arm_length();
+
+    // get position
+    camera_frame.pose.position.x = size_factor*(arm->wrist.get_x() - arm->shoulder.get_x())
+                                    + shoulder_to_hip_position.getX();
+    camera_frame.pose.position.y = size_factor*(arm->wrist.get_y() - arm->shoulder.get_y())
+                                    + shoulder_to_hip_position.getY();
+    camera_frame.pose.position.z = size_factor*(arm->wrist.get_z() - arm->shoulder.get_z())
+                                    + shoulder_to_hip_position.getZ();
+
+    // set orientation
+    tf2::Vector3 axis(x,y,z);
+    // note: the orientaion of hand could be improved by giving a rotation
+    tf2::Quaternion myQuaternion(axis, 0.0);
+    myQuaternion = myQuaternion.normalize();
+    camera_frame.pose.orientation.x = myQuaternion.getX();
+    camera_frame.pose.orientation.y = myQuaternion.getY();
+    camera_frame.pose.orientation.z = myQuaternion.getZ();
+    camera_frame.pose.orientation.w = myQuaternion.getW();
+
+    // rotate to robot frame
+    rotate_from_camera_to_robot(camera_frame, robot_frame);
+
+    return robot_frame;
+}
+
+// std::vector<double> CrossProduct1D(std::vector<double> const &a, std::vector<double> const &b)
+// {
+//     std::vector<double> r (a.size());  
+//     r[0] = a[1]*b[2]-a[2]*b[1];
+//     r[1] = a[2]*b[0]-a[0]*b[2];
+//     r[2] = a[0]*b[1]-a[1]*b[0];
+//     return r;
+// }
+
+/**
+ * @brief transform the pose in camera frame to robot frame
+ * 
+ * @param in
+ * @param out
+ */
+void robot_arm_control::rotate_from_camera_to_robot(geometry_msgs::PoseStamped& in, geometry_msgs::PoseStamped& out)
+{
+    // generate transform
+    geometry_msgs::TransformStamped Transform;
+    Transform.child_frame_id = move_group->getPlanningFrame();
+    
+    tf2::Quaternion myQuaternion;
+    myQuaternion.setRPY(pi/2,0,pi/2);
+    myQuaternion = myQuaternion.normalize();
+    Transform.transform.rotation.x = myQuaternion.getX();
+    Transform.transform.rotation.y = myQuaternion.getY();
+    Transform.transform.rotation.z = myQuaternion.getZ();
+    Transform.transform.rotation.w = myQuaternion.getW();
+
+    // do transform
+    tf2::doTransform(in, out, Transform);
 }

@@ -5,16 +5,30 @@ camera_pose::camera_pose(ros::NodeHandle nh, ros::NodeHandle nh_priv)
 :_nh(nh),_nh_priv(nh_priv)
 {
     _human_pose_sub = nh.subscribe("/human_pose", 1000, & camera_pose::HumanPoseCallback, this);
+    is_left_arm_ready = false;
+    is_right_arm_ready = false;
+
+    left_ready = new arm();
+    right_ready = new arm();
 }
 
 camera_pose::~camera_pose()
 {
+    free(left_ready);
+    free(right_ready);
 }
 
 void camera_pose::HumanPoseCallback(const camera_msg::JointState::ConstPtr& msg) 
 {
-    filter_callback_dat(msg->left, &left);
-    filter_callback_dat(msg->right, &right);
+    is_left_arm_ready = filter_callback_dat(msg->left, &left);
+    if (is_left_arm_ready) {
+        arm::copy(&left, left_ready);
+    }
+
+    is_right_arm_ready = filter_callback_dat(msg->right, &right);
+    if (is_right_arm_ready) {
+        arm::copy(&right, right_ready);
+    }
 }
 
 /**
@@ -23,47 +37,61 @@ void camera_pose::HumanPoseCallback(const camera_msg::JointState::ConstPtr& msg)
  * @param original 
  * @param to_save 
  */
-void camera_pose::filter_callback_dat(camera_msg::arm original, arm* to_save)
+bool camera_pose::filter_callback_dat(camera_msg::arm original, arm* to_save)
 {
-    joint_copy(original.elbow, &(to_save->elbow));
-    joint_copy(original.hand_index, &(to_save->hand_index));
-    joint_copy(original.hand_pinky, &(to_save->hand_pinky));
-    joint_copy(original.hand_thumb, &(to_save->hand_thumb));
-    joint_copy(original.hip, &(to_save->hip));
-    joint_copy(original.shoulder, &(to_save->shoulder));
-    joint_copy(original.wrist, &(to_save->wrist));
+    joint::joint_copy(original.elbow, &(to_save->elbow));
+    joint::joint_copy(original.hand_index, &(to_save->hand_index));
+    joint::joint_copy(original.hand_pinky, &(to_save->hand_pinky));
+    joint::joint_copy(original.hand_thumb, &(to_save->hand_thumb));
+    joint::joint_copy(original.hip, &(to_save->hip));
+    joint::joint_copy(original.shoulder, &(to_save->shoulder));
+    joint::joint_copy(original.wrist, &(to_save->wrist));
     
     // show results
     printf("[Arm Log] elbow - x: %f, y: %f, z: %f\n", to_save->elbow.get_x(), to_save->elbow.get_y(), to_save->elbow.get_z());
+
+    // check state
+    bool state = true;
+    state = state && to_save->elbow.is_reliable();
+    state = state && to_save->shoulder.is_reliable();
+    state = state && to_save->wrist.is_reliable();
+    state = state && to_save->hip.is_reliable();
+    return state;
 }
 
 /**
- * @brief copy the joint data
+ * @brief Get the left arm object
+ * return null when the data is not updated or ready
  * 
- * @param src 
- * @param dest 
+ * @return arm *
  */
-void camera_pose::joint_copy(std::vector<float> src, joint* dest)
+arm* camera_pose::get_left_arm() 
 {
-    // invalid
-    if (is_same(src[0], 0.0) 
-        && is_same(src[1], 0.0)
-        && is_same(src[2], -1.0)) 
-    {
-        dest->set_reliable(false);
+    if (is_left_arm_ready) {
+        // ready
+        return left_ready;
     }
     else {
-        // valid
-        dest->set_x(src[0]);
-        dest->set_y(src[1]);
-        dest->set_z(src[2]);
-        dest->set_reliable(true);
+        return NULL;
     }
+    is_left_arm_ready = false;
 }
 
-// compare two double number
-bool camera_pose::is_same(double a, double b)
+/**
+ * @brief Get the left arm object
+ * return null when the data is not updated or ready
+ * 
+ * @return arm *
+ */
+arm* camera_pose::get_right_arm() 
 {
-    return fabs(a - b) < EPSILON;
+    if (is_right_arm_ready) {
+        // ready
+        return right_ready;
+    }
+    else {
+        return NULL;
+    }
+    is_right_arm_ready = false;
 }
 

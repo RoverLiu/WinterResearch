@@ -2,8 +2,8 @@
  * @file robot_arm_control.h
  * @author Rover
  * @brief Control robot arm with all basic functions
- * @version 0.1
- * @date 2022-02-16
+ * @version 0.2
+ * @date 2022-07-15
  * 
  * @copyright Copyright (c) 2022
  * 
@@ -22,6 +22,10 @@
 #include <moveit_msgs/CollisionObject.h>
 
 #include <moveit_visual_tools/moveit_visual_tools.h>
+
+#include <moveit/robot_model/robot_model.h>
+#include <moveit/robot_state/robot_state.h>
+#include <tf2/LinearMath/Vector3.h>
 // #include <trajectory_msgs.h>
 #include <iostream>
 #include <string> // for string class
@@ -30,6 +34,7 @@
 #include "std_msgs/String.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include "arm.h"
 
 class robot_arm_control 
 {
@@ -51,14 +56,6 @@ class robot_arm_control
          * @param waypoints a vector saves all changing angle to reach
          */
         void CartesianPath_move_arm( std::vector<geometry_msgs::Pose> waypoints);
-
-        /**
-         * @brief pick up the chocolate from a point and deliver it to the end position
-         * 
-         * @param goal The position to pick up the chocolate
-         * @param end_pos THe position to drop the chocolate
-         */
-        void pick_up_and_delivery(geometry_msgs::Pose goal, geometry_msgs::Pose end_pos);
 
         /**
          * @brief Get the direction object
@@ -93,7 +90,14 @@ class robot_arm_control
          * 
          * @param joint_group_positions The angle for each joint
          */
-        void reset_arm_pos(std::vector<double> joint_group_positions);
+        void move_to_arm_pos_by_angle(std::vector<double> joint_group_positions);
+        
+        /**
+         * @brief move to the target position with given the id
+         * 
+         * @param id the index of angle in the joint_values
+         */
+        void move_to_arm_pos_by_id(int id);
 
         /**
          * @brief detach the stand from the world
@@ -106,6 +110,41 @@ class robot_arm_control
          * 
          */
         void attach_stand_object();
+
+        /**
+         * @brief calculate all possible joint angle groups 
+         * for the given EEF pose
+         * All potentail results are saved in joint_values
+         * 
+         * @param target 
+         */
+        void calculate_joint_angles(geometry_msgs::Pose target);
+
+        /**
+         * @brief Get the angle positions for all solutions
+         * loaded in the joint_values
+         * 
+         * @return std::vector<std::vector<std::vector<double>>> 
+         * [[[1,1,1],[2,2,2],[3,3,3],[4,4,4],[5,5,5],...]]
+         * n*7*3
+         */
+        std::vector<std::vector<std::vector<double>>> get_angle_positions();
+
+        /**
+         * @brief Get the angle position object
+         * 
+         * @return std::vector<std::vector<double>> a group of vector for each joint 
+         */
+        std::vector<std::vector<double>> get_angle_position(std::vector<double> angle);
+          
+        /**
+         * @brief Get the pose object
+         * calculate the pose of the hand by given arm detials
+         * @param arm 
+         * @param shoulder_to_hip_position the position transform from hip to shoulder
+         * @return geometry_msgs::PoseStamped pose of arm
+         */
+        geometry_msgs::PoseStamped get_pose_in_robot_frame(arm* arm, tf2::Vector3& shoulder_to_hip_position);
 
     private:
         // data
@@ -133,15 +172,57 @@ class robot_arm_control
 
         // Raw pointers are frequently used to refer to the planning group for improved performance.
         const robot_state::JointModelGroup* joint_model_group;
+        robot_state::RobotStatePtr robot_kinematic_state;
         // const robot_state::JointModelGroup* right_joint_model_group;
 
         moveit::planning_interface::MoveGroupInterface::Plan my_plan;
 
+        // a vector to save all results (angles)
+        std::vector<std::vector<double>> joint_values;
+
+        // a vector saves all joint names
+        std::vector<std::string> joint_names;
+
         const double pi = 3.1415926535;
+        const double IK_timeout = 0.1;
+        const double ROBOT_ARM_LENGTH = 0.76;
 
         // collision object
         moveit_msgs::CollisionObject table;
         moveit_msgs::CollisionObject stand;
+
+        /**
+         * @brief callback function for IK solver
+         * will always return false, which pushes the 
+         * solver to find all possible solutions with target pose
+         * 
+         * @param robot_state 
+         * @param joint_group 
+         * @param joint_group_variable_values 
+         * @return true 
+         * @return false 
+         */
+        bool save_IK_callback(robot_state::RobotState* robot_state, 
+                const robot_state::JointModelGroup* joint_group, 
+                const double* joint_group_variable_values);
+        
+        /**
+         * @brief copy the vector from pointer to std::vector
+         * 
+         * @param src const double as source
+         * @param dest target std::vector format (destination)
+         * @param size the size of the pointer
+         */
+        void vector_copy(const double* src, std::vector<double> *dest, int size);
+
+        /**
+         * @brief transform the pose in camera frame to robot frame
+         * 
+         * @param in
+         * @param out
+         */
+        void rotate_from_camera_to_robot(geometry_msgs::PoseStamped& in, geometry_msgs::PoseStamped& out);
+            
 };
 
 #endif

@@ -23,6 +23,29 @@ public:
     arm(/* args */);
     ~arm();
 
+    /**
+     * @brief copy the arm
+     * 
+     * @param src 
+     * @param dest 
+     */
+    static void copy(arm* src, arm* dest);
+
+    /**
+     * @brief Get the arm length
+     * 
+     * @return double 
+     */
+    double get_arm_length();
+
+    /**
+     * @brief Get the arm positions 
+     * 
+     * @return std::vector<std::vector<double>> [wrist/elbow/shoulder]*[x,y,z]
+     */
+    std::vector<std::vector<double>> get_arm_positions();
+
+
     // data
     joint hip;
     joint shoulder;
@@ -31,6 +54,9 @@ public:
     joint hand_thumb;
     joint hand_pinky;
     joint hand_index;
+
+
+
 };
 
 #endif

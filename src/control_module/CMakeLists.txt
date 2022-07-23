@@ -175,7 +175,10 @@ add_executable(${PROJECT_NAME}_node
   src/camera_pose.cpp 
   src/joint.cpp 
   src/main.cpp
-  # src/arm_manager.cpp
+  src/arm_manager.cpp
+  src/control_manager.cpp
+  src/difference_calculator.cpp
+  src/MinimumDistance4.cpp
   src/robot_arm_control.cpp)
 
 add_executable(arm_test_node src/arm_controller.cpp)

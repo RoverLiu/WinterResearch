@@ -12,7 +12,7 @@ class coordinate{
         double dminsum;
         void cal();
         void print();        
-    
+        double get_dist();
 };
 
 #endif

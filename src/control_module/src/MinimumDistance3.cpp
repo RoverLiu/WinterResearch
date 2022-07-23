@@ -54,35 +54,40 @@ void coordinate::print(){
 
 }
 
-int main(){
-    ///Given 9 structures
-    struct S_Point ch1, ch2, ch3; //ch means the Coordinate of Human arm
-    ch1.x = 2.3; ch1.y = 3.4; ch1.z = 4.2;
-    ch2.x = 3.3; ch2.y = 4.2; ch2.z = 6.2;
-    ch3.x = 4.3; ch3.y = 6.4; ch3.z = 8.2;
-    struct S_Point cy1, cy2, cy3, cy4, cy5, cy6;//cy means the Coordinate of Yumi arm
-    
-    if (true){
-        cy1.x = 1.2; cy1.y = 1.2; cy1.z = 1.6;
-        cy2.x = 1.3; cy2.y = 2.2; cy2.z = 1.5;
-        cy3.x = 1.4; cy3.y = 1.2; cy3.z = 1.4;
-        cy4.x = 1.5; cy4.y = 2.2; cy4.z = 1.3;
-        cy5.x = 1.6; cy5.y = 1.2; cy5.z = 1.2;
-        cy6.x = 1.7; cy6.y = 2.2; cy6.z = 1.1;
-    }
-
-    class coordinate test1;
-    if (true){
-        test1.ch1 = ch1; test1.ch2 = ch2; test1.ch3 = ch3; 
-        test1.cy1 = cy1; test1.cy2 = cy2; test1.cy3 = cy3; 
-        test1.cy4 = cy4; test1.cy5 = cy5; test1.cy6 = cy6;
-    }
-         
-    test1.cal();
-    test1.print();
-    
-    return 0;
+double coordinate::get_dist()
+{
+    return dminsum;
 }
+
+// int main(){
+//     ///Given 9 structures
+//     struct S_Point ch1, ch2, ch3; //ch means the Coordinate of Human arm
+//     ch1.x = 2.3; ch1.y = 3.4; ch1.z = 4.2;
+//     ch2.x = 3.3; ch2.y = 4.2; ch2.z = 6.2;
+//     ch3.x = 4.3; ch3.y = 6.4; ch3.z = 8.2;
+//     struct S_Point cy1, cy2, cy3, cy4, cy5, cy6;//cy means the Coordinate of Yumi arm
+    
+//     if (true){
+//         cy1.x = 1.2; cy1.y = 1.2; cy1.z = 1.6;
+//         cy2.x = 1.3; cy2.y = 2.2; cy2.z = 1.5;
+//         cy3.x = 1.4; cy3.y = 1.2; cy3.z = 1.4;
+//         cy4.x = 1.5; cy4.y = 2.2; cy4.z = 1.3;
+//         cy5.x = 1.6; cy5.y = 1.2; cy5.z = 1.2;
+//         cy6.x = 1.7; cy6.y = 2.2; cy6.z = 1.1;
+//     }
+
+//     class coordinate test1;
+//     if (true){
+//         test1.ch1 = ch1; test1.ch2 = ch2; test1.ch3 = ch3; 
+//         test1.cy1 = cy1; test1.cy2 = cy2; test1.cy3 = cy3; 
+//         test1.cy4 = cy4; test1.cy5 = cy5; test1.cy6 = cy6;
+//     }
+         
+//     test1.cal();
+//     test1.print();
+    
+//     return 0;
+// }
 
 
 

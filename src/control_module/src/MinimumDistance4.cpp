@@ -88,37 +88,37 @@ void coordinate::print(){
 
 }
 
-int main(){
-    ///Given 9 structures
-    struct S_Point ch1, ch2, ch3; //ch means the Coordinate of Human arm
-    if (true){
-        ch1.x = 2.3; ch1.y = 3.4; ch1.z = 4.2;
-        ch2.x = 3.3; ch2.y = 4.4; ch2.z = 5.2;
-        ch3.x = 4.3; ch3.y = 6.4; ch3.z = 8.2;
-    }
-    struct S_Point cy1, cy2, cy3, cy4, cy5, cy6;//cy means the Coordinate of Yumi arm    
-    if (true){
-        cy1.x = 1.2; cy1.y = 1.2; cy1.z = 1.6;
-        cy2.x = 2.3; cy2.y = 2.4; cy2.z = 2.5;
-        cy3.x = 3.4; cy3.y = 4.6; cy3.z = 4.4;
-        cy4.x = 4.1; cy4.y = 5.1; cy4.z = 5.3;
-        cy5.x = 5.5; cy5.y = 5.4; cy5.z = 6.2;
-        cy6.x = 6.9; cy6.y = 7.8; cy6.z = 8.1;
-    }
-    class coordinate test1;
-    if (true){
-        test1.ch1 = ch1; test1.ch2 = ch2; test1.ch3 = ch3; 
-        test1.cy1 = cy1; test1.cy2 = cy2; test1.cy3 = cy3; 
-        test1.cy4 = cy4; test1.cy5 = cy5; test1.cy6 = cy6;
-    }
+// int main(){
+//     ///Given 9 structures
+//     struct S_Point ch1, ch2, ch3; //ch means the Coordinate of Human arm
+//     if (true){
+//         ch1.x = 2.3; ch1.y = 3.4; ch1.z = 4.2;
+//         ch2.x = 3.3; ch2.y = 4.4; ch2.z = 5.2;
+//         ch3.x = 4.3; ch3.y = 6.4; ch3.z = 8.2;
+//     }
+//     struct S_Point cy1, cy2, cy3, cy4, cy5, cy6;//cy means the Coordinate of Yumi arm    
+//     if (true){
+//         cy1.x = 1.2; cy1.y = 1.2; cy1.z = 1.6;
+//         cy2.x = 2.3; cy2.y = 2.4; cy2.z = 2.5;
+//         cy3.x = 3.4; cy3.y = 4.6; cy3.z = 4.4;
+//         cy4.x = 4.1; cy4.y = 5.1; cy4.z = 5.3;
+//         cy5.x = 5.5; cy5.y = 5.4; cy5.z = 6.2;
+//         cy6.x = 6.9; cy6.y = 7.8; cy6.z = 8.1;
+//     }
+//     class coordinate test1;
+//     if (true){
+//         test1.ch1 = ch1; test1.ch2 = ch2; test1.ch3 = ch3; 
+//         test1.cy1 = cy1; test1.cy2 = cy2; test1.cy3 = cy3; 
+//         test1.cy4 = cy4; test1.cy5 = cy5; test1.cy6 = cy6;
+//     }
          
-    test1.cal();
-    test1.print();
+//     test1.cal();
+//     test1.print();
     
-    return 0;
-}
+//     return 0;
+// }
 
-//µÃµ½£³£èµã¡¡£¶£ùµã£»¹éÒ»»¯£»Çó¹Ø½Ú³¤¶È£»Ëõ·ÅÈËÊÖ¹Ø½Ú£»Çó¾àÀë
+//ï¿½Ãµï¿½ï¿½ï¿½ï¿½ï¿½ã¡¡ï¿½ï¿½ï¿½ï¿½ï¿½ã£»ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ø½Ú³ï¿½ï¿½È£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¹Ø½Ú£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 
 
