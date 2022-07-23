@@ -1,9 +1,17 @@
+/**
+ * @file difference_calculator.h
+ * @author Rover (you@domain.com)
+ * @brief The interface to for pose comparison
+ * @version 0.1
+ * @date 2022-07-20
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
 #ifndef __DIFFERENCE_CALCULATOR_H
 #define __DIFFERENCE_CALCULATOR_H
 
-#include "arm_manager.h"
-#include "camera_pose.h"
-
+#include <vector>
 class difference_calculator
 {
 private:
@@ -21,7 +29,8 @@ public:
      * @param arm_poses The human arm psoiton [number of joints]*[x,y,z]
      * @return int The index of the best solution
      */
-    int get_best_index(std::vector<std::vector<double>> robot_poses, std::vector<double> arm_poses);
+    int get_best_index(std::vector<std::vector<std::vector<double>>> robot_poses, 
+                                    std::vector<std::vector<double>> arm_poses);
 
 
 };

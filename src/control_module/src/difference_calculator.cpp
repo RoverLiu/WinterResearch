@@ -1,4 +1,5 @@
 #include "difference_calculator.h"
+#include <vector>
 
 difference_calculator::difference_calculator(/* args */)
 {
@@ -17,7 +18,8 @@ difference_calculator::~difference_calculator()
  * @param arm_poses The human arm psoiton [number of joints]*[x,y,z]
  * @return int The index of the best solution
  */
-int difference_calculator::get_best_index(std::vector<std::vector<double>> robot_poses, std::vector<double> arm_poses) 
+int difference_calculator::get_best_index(std::vector<std::vector<std::vector<double>>> robot_poses, 
+                                                        std::vector<std::vector<double>> arm_poses) 
 {
     
 }
