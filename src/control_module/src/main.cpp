@@ -12,9 +12,7 @@ int main( int argc, char** argv )
     ros::AsyncSpinner spinner(2);
     spinner.start();
 
-    // todo
     control_manager my_control_manager(nh, nh_priv);
-
 
     while( ros::ok() )
     { 
