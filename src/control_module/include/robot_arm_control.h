@@ -146,6 +146,14 @@ class robot_arm_control
          */
         geometry_msgs::PoseStamped get_pose_in_robot_frame(arm* arm, tf2::Vector3& shoulder_to_hip_position);
 
+        /**
+         * @brief transform the pose in camera frame to robot frame
+         * 
+         * @param in
+         * @param out
+         */
+        void rotate_from_camera_to_robot(geometry_msgs::PoseStamped& in, geometry_msgs::PoseStamped& out);
+       
     private:
         // data
         // ROS NodeHandle
@@ -216,13 +224,10 @@ class robot_arm_control
         void vector_copy(const double* src, std::vector<double> *dest, int size);
 
         /**
-         * @brief transform the pose in camera frame to robot frame
-         * 
-         * @param in
-         * @param out
+         * @brief cross product
          */
-        void rotate_from_camera_to_robot(geometry_msgs::PoseStamped& in, geometry_msgs::PoseStamped& out);
-            
+        std::vector<double> CrossProduct1D(std::vector<double> const &a, std::vector<double> const &b);
+     
 };
 
 #endif

@@ -38,7 +38,7 @@ void joint::set_y(double _y) {
 }
 
 void joint::set_z(double _z) {
-    x = _z;
+    z = _z;
 }
 
 bool joint::is_reliable() {
@@ -67,8 +67,8 @@ void joint::joint_copy(std::vector<float> src, joint* dest)
     else {
         // valid
         dest->set_x(src[0]);
-        dest->set_y(src[1]);
-        dest->set_z(src[2]);
+        dest->set_y(-src[1]);
+        dest->set_z(-src[2]);
         dest->set_reliable(true);
     }
 }
@@ -78,6 +78,7 @@ void joint::joint_copy(joint* src, joint* dest)
     dest->set_x(src->get_x());
     dest->set_y(src->get_y());
     dest->set_z(src->get_z());
+    dest->set_reliable(src->is_reliable());
 }
 
 

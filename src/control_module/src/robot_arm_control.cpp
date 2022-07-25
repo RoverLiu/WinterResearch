@@ -420,7 +420,7 @@ std::vector<std::vector<std::vector<double>>> robot_arm_control::get_angle_posit
 {
     // loop through and save
     std::vector<std::vector<std::vector<double>>> res;
-    std::cout<<"total "<< joint_values.size() << "solutions would be returned\n";
+    std::cout<<"total "<< joint_values.size() << " solutions would be returned\n";
     for (int i = 0; i < joint_values.size(); i++) {
         res.push_back(get_angle_position(joint_values[i]));
     }
@@ -473,6 +473,8 @@ geometry_msgs::PoseStamped robot_arm_control::get_pose_in_robot_frame(arm* arm, 
     double y = 0;
     double z = 0;
     int count = 0;
+    printf("[ROBOT ARM CONTROL] Hand index details: (%f, %f, %f, %d)\n", arm->hand_index.get_x(),
+        arm->hand_index.get_y(), arm->hand_index.get_z(), arm->hand_index.is_reliable());
     if (arm->hand_index.is_reliable()) {
         x+=arm->hand_index.get_x();
         y+=arm->hand_index.get_y();
@@ -491,6 +493,7 @@ geometry_msgs::PoseStamped robot_arm_control::get_pose_in_robot_frame(arm* arm, 
         z+=arm->hand_thumb.get_z();
         count += 1;
     }
+    // printf("[ROBOT ARM CONTROL] Orientation in the middle: (%f, %f, %f)\n", x,y,z);
 
     // get vector relative to wrist
     if (count != 0) {
@@ -511,26 +514,50 @@ geometry_msgs::PoseStamped robot_arm_control::get_pose_in_robot_frame(arm* arm, 
     // size_factor*(human wrist relative to human shoulder)+(robot shoulder relative to robot hip)
     double size_factor = ROBOT_ARM_LENGTH / arm->get_arm_length();
 
+    printf("[ROBOT ARM CONTROL] wrist postion in camera frame: (%f, %f, %f)\n\t shoulder postion in camera frame: (%f, %f, %f)\n",
+        arm->wrist.get_x(), arm->wrist.get_y(), arm->wrist.get_z(),
+        arm->shoulder.get_x(), arm->shoulder.get_y(), arm->shoulder.get_z());
+
     // get position
-    camera_frame.pose.position.x = size_factor*(arm->wrist.get_x() - arm->shoulder.get_x())
-                                    + shoulder_to_hip_position.getX();
-    camera_frame.pose.position.y = size_factor*(arm->wrist.get_y() - arm->shoulder.get_y())
-                                    + shoulder_to_hip_position.getY();
-    camera_frame.pose.position.z = size_factor*(arm->wrist.get_z() - arm->shoulder.get_z())
-                                    + shoulder_to_hip_position.getZ();
+    camera_frame.pose.position.x = size_factor*(arm->wrist.get_x() - arm->shoulder.get_x());
+    camera_frame.pose.position.y = size_factor*(arm->wrist.get_y() - arm->shoulder.get_y());
+    camera_frame.pose.position.z = size_factor*(arm->wrist.get_z() - arm->shoulder.get_z());
 
     // set orientation
-    tf2::Vector3 axis(x,y,z);
-    // note: the orientaion of hand could be improved by giving a rotation
-    tf2::Quaternion myQuaternion(axis, 0.0);
-    myQuaternion = myQuaternion.normalize();
-    camera_frame.pose.orientation.x = myQuaternion.getX();
-    camera_frame.pose.orientation.y = myQuaternion.getY();
-    camera_frame.pose.orientation.z = myQuaternion.getZ();
-    camera_frame.pose.orientation.w = myQuaternion.getW();
+    printf("[ROBOT ARM CONTROL] Orientation: (%f, %f, %f)\n", x,y,z);
+    // tf2::Vector3 axis;
+    // axis.setX(x);
+    // axis.setY(y);
+    // axis.setZ(z);
+    // // note: the orientaion of hand could be improved by giving a rotation
+    // tf2::Quaternion myQuaternion(axis, 0.0);
+    // myQuaternion = myQuaternion.normalize();
+    // camera_frame.pose.orientation.x = myQuaternion.getX();
+    // camera_frame.pose.orientation.y = myQuaternion.getY();
+    // camera_frame.pose.orientation.z = myQuaternion.getZ();
+    // camera_frame.pose.orientation.w = myQuaternion.getW();
+    std::vector<double> original, goal;
+    original.push_back(0);
+    original.push_back(0);
+    original.push_back(1);
+
+    goal.push_back(x);
+    goal.push_back(y);
+    goal.push_back(z);
+    
+    std::vector<double> cross_product = CrossProduct1D(original, goal);
+
+    camera_frame.pose.orientation.x = cross_product[0];
+    camera_frame.pose.orientation.y = cross_product[1];
+    camera_frame.pose.orientation.z = cross_product[2];
+    camera_frame.pose.orientation.w = std::sqrt(x*x+y*y+z*z)+z;
 
     // rotate to robot frame
     rotate_from_camera_to_robot(camera_frame, robot_frame);
+
+    robot_frame.pose.position.x += shoulder_to_hip_position.getX();
+    robot_frame.pose.position.y += shoulder_to_hip_position.getY();
+    robot_frame.pose.position.z += shoulder_to_hip_position.getZ();
 
     printf("[ROBOT ARM CONTROL] camera frame: (%f, %f, %f)\n \trobot frame: (%f, %f, %f)\n \tsize factor: %f\n",
         camera_frame.pose.position.x, camera_frame.pose.position.y, camera_frame.pose.position.z,
@@ -540,23 +567,26 @@ geometry_msgs::PoseStamped robot_arm_control::get_pose_in_robot_frame(arm* arm, 
     return robot_frame;
 }
 
-// std::vector<double> CrossProduct1D(std::vector<double> const &a, std::vector<double> const &b)
-// {
-//     std::vector<double> r (a.size());  
-//     r[0] = a[1]*b[2]-a[2]*b[1];
-//     r[1] = a[2]*b[0]-a[0]*b[2];
-//     r[2] = a[0]*b[1]-a[1]*b[0];
-//     return r;
-// }
+std::vector<double> robot_arm_control::CrossProduct1D(std::vector<double> const &a, std::vector<double> const &b)
+{
+    std::vector<double> r (a.size());  
+    r[0] = a[1]*b[2]-a[2]*b[1];
+    r[1] = a[2]*b[0]-a[0]*b[2];
+    r[2] = a[0]*b[1]-a[1]*b[0];
+    return r;
+}
 
 /**
  * @brief transform the pose in camera frame to robot frame
  * 
- * @param in
- * @param out
+ * @param in camera frame
+ * NOTE: z would be inverse (human frame and camera frame)
+ * @param out   robot frame
  */
 void robot_arm_control::rotate_from_camera_to_robot(geometry_msgs::PoseStamped& in, geometry_msgs::PoseStamped& out)
 {
+    // // align the frame
+    // in.pose.position.z *= -1;
     // generate transform
     geometry_msgs::TransformStamped Transform;
     Transform.child_frame_id = move_group->getPlanningFrame();

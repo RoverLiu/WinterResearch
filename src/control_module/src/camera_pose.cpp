@@ -20,12 +20,14 @@ camera_pose::~camera_pose()
 
 void camera_pose::HumanPoseCallback(const camera_msg::JointState::ConstPtr& msg) 
 {
-    // std::cout<<"Callback triggered\n";
+    // std::cout<<"Left hand\n";
     is_left_arm_ready = filter_callback_dat(msg->left, &left);
     if (is_left_arm_ready) {
         arm::copy(&left, left_ready);
+        // printf("[Arm Log] wrist saved - x: %f, y: %f, z: %f\n", left_ready->wrist.get_x(), left_ready->wrist.get_y(), left_ready->wrist.get_z());
     }
 
+    // std::cout<<"Right hand\n";
     is_right_arm_ready = filter_callback_dat(msg->right, &right);
     if (is_right_arm_ready) {
         arm::copy(&right, right_ready);
@@ -49,14 +51,14 @@ bool camera_pose::filter_callback_dat(camera_msg::arm original, arm* to_save)
     joint::joint_copy(original.wrist, &(to_save->wrist));
     
     // show results
-    // printf("[Arm Log] elbow - x: %f, y: %f, z: %f\n", to_save->elbow.get_x(), to_save->elbow.get_y(), to_save->elbow.get_z());
+    // printf("[Arm Log] hand_pinky to save - x: %f, y: %f, z: %f\n", to_save->hand_pinky.get_x(), to_save->hand_pinky.get_y(), to_save->hand_pinky.get_z());
 
     // check state
     bool state = true;
     state = state && to_save->elbow.is_reliable();
     state = state && to_save->shoulder.is_reliable();
     state = state && to_save->wrist.is_reliable();
-    state = state && to_save->hip.is_reliable();
+    // state = state && to_save->hip.is_reliable();
     return state;
 }
 
