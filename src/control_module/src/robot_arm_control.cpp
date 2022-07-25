@@ -72,48 +72,48 @@ robot_arm_control::robot_arm_control(ros::NodeHandle nh, ros::NodeHandle nh_priv
     //------------------------------------------set up objects avoidance-------------------------------------
     // set up table and stand
     table.header.frame_id = move_group->getPlanningFrame();
-    stand.header.frame_id = move_group->getPlanningFrame();
+    // stand.header.frame_id = move_group->getPlanningFrame();
     table.id = "table";
-    stand.id = "chocolate_stand";
+    // stand.id = "chocolate_stand";
     shape_msgs::SolidPrimitive primitive;
-    shape_msgs::SolidPrimitive stand_primitive;
+    // shape_msgs::SolidPrimitive stand_primitive;
 
     primitive.type = primitive.BOX;
     primitive.dimensions.resize(3);
-    primitive.dimensions[0] = 1.5;
+    primitive.dimensions[0] = 3.0;
     primitive.dimensions[1] = 2.0;
     primitive.dimensions[2] = 0.2;
 
-    stand_primitive.type = stand_primitive.BOX;
-    stand_primitive.dimensions.resize(3);
-    stand_primitive.dimensions[0] = 0.05;
-    stand_primitive.dimensions[1] = 1.0;
-    stand_primitive.dimensions[2] = 0.15;
+    // stand_primitive.type = stand_primitive.BOX;
+    // stand_primitive.dimensions.resize(3);
+    // stand_primitive.dimensions[0] = 0.05;
+    // stand_primitive.dimensions[1] = 1.0;
+    // stand_primitive.dimensions[2] = 0.15;
 
     // object position
     geometry_msgs::Pose box_pose;
     box_pose.orientation.w = 1.0;
-    box_pose.position.x = 0.5;
+    box_pose.position.x = 1.5;
     box_pose.position.y = 0.0;
     box_pose.position.z = -0.1;
 
-    geometry_msgs::Pose stand_pose;
-    stand_pose.orientation.w = 1.0;
-    stand_pose.position.x = 0.45;
-    stand_pose.position.y = 0.0;
-    stand_pose.position.z = 0.075;
+    // geometry_msgs::Pose stand_pose;
+    // stand_pose.orientation.w = 1.0;
+    // stand_pose.position.x = 0.45;
+    // stand_pose.position.y = 0.0;
+    // stand_pose.position.z = 0.075;
 
     table.primitives.push_back(primitive);
     table.primitive_poses.push_back(box_pose);
     table.operation = table.ADD;
 
-    stand.primitives.push_back(stand_primitive);
-    stand.primitive_poses.push_back(stand_pose);
-    stand.operation = stand.ADD;
+    // stand.primitives.push_back(stand_primitive);
+    // stand.primitive_poses.push_back(stand_pose);
+    // stand.operation = stand.ADD;
 
     std::vector<moveit_msgs::CollisionObject> collision_objects;
     collision_objects.push_back(table);
-    collision_objects.push_back(stand);
+    // collision_objects.push_back(stand);
     
     ROS_INFO( "Add objects into the world");
     planning_scene_interface.addCollisionObjects(collision_objects);
@@ -322,6 +322,12 @@ void robot_arm_control::move_to_arm_pos_by_id(int id)
     move_group->setJointValueTarget(joint_values[id]);
     move_group->plan(my_plan);
     move_group->move();
+
+    // clear the data
+    std::vector<double> best;
+    best = joint_values[id];
+    joint_values.clear();
+    joint_values.push_back(best);
 }
 
 
@@ -357,7 +363,7 @@ void robot_arm_control::attach_stand_object()
  */
 void robot_arm_control::calculate_joint_angles(geometry_msgs::Pose target) 
 {
-    joint_values.clear();
+    // joint_values.clear();
     auto bind_callback = boost::bind(& robot_arm_control::save_IK_callback, this, _1, _2, _3);
     robot_kinematic_state->setFromIK(joint_model_group, target, IK_timeout, bind_callback);
 

@@ -48,7 +48,7 @@ void control_manager::imitate_one_arm(arm* camera_arm, robot_arm_control* robot_
 
         // protect the gripper
         if (EEF_pose.pose.position.z < MINIMUM_Z) {
-            EEF_pose.pose.position.z = MINIMUM_Z
+            EEF_pose.pose.position.z = MINIMUM_Z;
         }
         
         printf("CONTROL MANAGER: Robot target position: %f %f %f\n", EEF_pose.pose.position.x,
