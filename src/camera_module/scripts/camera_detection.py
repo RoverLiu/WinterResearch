@@ -8,7 +8,7 @@ import numpy as np
 import rospy
 import mediapipe as mp
 from camera_msg.msg import JointState
-
+import time
 
 class human_pose_estimation:
     
@@ -56,7 +56,7 @@ class human_pose_estimation:
 
         self.aligned_depth_frame = aligned_frames.get_depth_frame()      #  Gets the in the alignment frame depth frame  
         self.aligned_color_frame = aligned_frames.get_color_frame()      #  Gets the in the alignment frame color frame 
-
+        
         ####  Get camera parameters  ####
         self.depth_intrin = self.aligned_depth_frame.profile.as_video_stream_profile().intrinsics     #  Get the depth parameter （ Pixel coordinate system to camera coordinate system will use ）
         self.color_intrin = self.aligned_color_frame.profile.as_video_stream_profile().intrinsics     #  Get camera internal parameters 
@@ -74,9 +74,9 @@ class human_pose_estimation:
         x = depth_pixel[0]
         y = depth_pixel[1]
         self.dis = self.aligned_depth_frame.get_distance(x, y)        #  Get the depth corresponding to the pixel 
-        # print ('depth: ',dis) #  The unit of depth is m
+        # print ('depth: ',self.dis) #  The unit of depth is m
         self.camera_coordinate = rs.rs2_deproject_pixel_to_point(self.depth_intrin, depth_pixel, self.dis)
-        # print ('camera_coordinate: ',camera_coordinate)
+        # print ('camera_coordinate: ',self.camera_coordinate)
         return self.camera_coordinate
     
     def landmark2coordinate(self, landmark):
@@ -95,7 +95,6 @@ class human_pose_estimation:
 
         # draw
         self.draw(depth_pixel, self.camera_coordinate)
-        
         return self.camera_coordinate
 
     # get the pose of human if there is
@@ -162,6 +161,13 @@ class human_pose_estimation:
         output.right.hip = self.landmark2coordinate(landmark=landmarks.landmark[24])
         # output.right.hip = [landmarks.landmark[24].x, landmarks.landmark[24].y, landmarks.landmark[24].z, landmarks.landmark[24].visibility]
         
+        print("output.left.shoulder =",  output.left.shoulder)
+        print("output.left.elbow =",  output.left.elbow)
+        print("output.left.wrist =", output.left.wrist)
+        print("output.right.shoulder =", output.right.shoulder)
+        print("output.right.elbow =", output.right.elbow)
+        print("output.right.wrist =", output.right.wrist)
+
         # update for ros
         self.pub.publish(output)
         
@@ -182,6 +188,12 @@ class human_pose_estimation:
             # detect the poses
             self.detect_pose(self.img_color)
             
+            #############
+            print(" ")
+            print('***********************************************************')
+            # time.sleep(1)
+            #############
+
             # show the status        
             cv2.imshow('RealSence',self.img_color)
             key = cv2.waitKey(10)
